@@ -5,7 +5,7 @@ export default function(props){
   console.log('props',props);
   return(
       <div>
-        <Link to={`/blog/${props.item._id}`}>
+        <Link to={`/article/${props.item._id}`}>
             <h3>{props.item.title}</h3>
         </Link>
         <div>
