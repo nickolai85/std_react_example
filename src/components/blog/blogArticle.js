@@ -8,11 +8,14 @@ class BlogArticle extends Component {
             user_name: 'Vasile',
             pageTitle: ''
       }
+        this.likeHendler = this.likeHendler.bind(this);
         this.article = this.article.bind(this);
     }
     article(){
-            const {autor,content,title,created_at} = this.state.data[0];
+            const {autor,content,title,likes,created_at} = this.state.data;
+            console.log('likes',likes)
            return <div>
+               <div>
                 <h1>{title}</h1>
                 <h3>{autor}</h3>
                 <p>
@@ -21,8 +24,52 @@ class BlogArticle extends Component {
                 <div>
                     {created_at}
                 </div>
+              </div>
+              <div>
+                  <div>
+                    <button className="btn" onClick={this.likeHendler}>like</button>
+                  </div>
+                  <div>
+                    {likes == 'undefined' ?  '0' : likes}
+                  </div>
+              </div>
             </div>
     }
+
+    likeHendler(){
+        
+        const url_temp_prefix = 'https://cors-anywhere.herokuapp.com/';
+        const url = `${url_temp_prefix}https://frontdb-214a.restdb.io/rest/blog/${this.props.match.params.article_id}`;
+        const likes = this.state.data.likes != null ? this.state.data.likes : 0;
+        console.log(likes);
+        const like = likes +1;
+        console.log('like',like)
+        var jsondata = {"likes": like};
+
+        var settings = {
+            "async": true,
+            "crossDomain": true,
+            "headers": {
+                "content-type": "application/json",
+                "x-apikey": "c2768b4671611332237f9ea2dd5723248a2fc",
+                "cache-control": "no-cache"
+            },
+            "processData": false,
+        }        
+        axios.put(url,jsondata,settings)
+        .then(response => {
+            console.log('responsesd',response.data);
+            this.setState({
+                data : response.data
+            }
+        )
+          })
+        .catch(error => {
+            console.log('error',error);
+        });
+    }
+
+
     getArticle(){
         const url_temp_prefix = 'https://cors-anywhere.herokuapp.com/';
         const query = `{"_id":"${this.props.match.params.article_id}"}`;
@@ -41,7 +88,7 @@ class BlogArticle extends Component {
         .then(response => {
             console.log('responsesd',response.data);
             this.setState({
-                data : response.data
+                data : response.data[0]
             }
         )
           })
